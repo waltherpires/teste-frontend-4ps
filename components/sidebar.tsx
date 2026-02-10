@@ -20,12 +20,12 @@ import { useAuth } from "@/lib/auth-context"
 import { useState } from "react"
 
 const navigation = [
-  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  /* { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard }, */
   { name: "DRE", href: "/dashboard/dre", icon: FileText },
-  { name: "DFC", href: "/dashboard/dfc", icon: Wallet },
-  { name: "Orçamento", href: "/dashboard/budget", icon: Target },
-  { name: "Inadimplência", href: "/dashboard/delinquency", icon: AlertTriangle },
-  { name: "Precificação", href: "/dashboard/pricing", icon: DollarSign },
+ /*  { name: "DFC", href: "/dashboard/dfc", icon: Wallet }, */
+  /* { name: "Orçamento", href: "/dashboard/budget", icon: Target }, */
+  /* { name: "Inadimplência", href: "/dashboard/delinquency", icon: AlertTriangle }, */
+ /*  { name: "Precificação", href: "/dashboard/pricing", icon: DollarSign }, */
 ]
 
 export function Sidebar() {
@@ -43,7 +43,6 @@ export function Sidebar() {
       <div className="flex items-center justify-between p-4 border-b border-sidebar-border">
         {!collapsed && (
           <Link href="/dashboard" className="flex items-center gap-2">
-            <TrendingUp className="h-6 w-6 text-primary" />
             <span className="font-semibold text-sidebar-foreground">4ps</span>
           </Link>
         )}

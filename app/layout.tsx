@@ -2,6 +2,7 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
+import { CadastrosProvider } from "@/lib/cadastros-context"
 import "./globals.css"
 
 const _inter = Inter({ subsets: ["latin"] })
@@ -37,7 +38,9 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body className={`${_inter.className} font-sans antialiased`}>
-        {children}
+        <CadastrosProvider>
+          {children}
+        </CadastrosProvider>
         <Analytics />
       </body>
     </html>

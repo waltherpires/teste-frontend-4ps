@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { FormDialog } from "@/components/ui/form-dialog"
 import { ConfirmDialog } from "@/components/ui/confirm-dialog"
-import { Plus, Pencil, Trash2 } from "lucide-react"
+import { Plus, Pencil, Trash2, ChevronRight, ChevronDown } from "lucide-react"
 import { useState } from "react"
 
 type Period = "jan" | "fev" | "mar" | "abr" | "mai" | "jun"
@@ -118,6 +118,7 @@ const periodLabels: Record<Period, string> = {
 
 export function DRETable() {
   const [categories, setCategories] = useState<DRECategory[]>(initialDreData)
+  const [expandedIds, setExpandedIds] = useState<string[]>([])
   const [selectedPeriods] = useState<Period[]>(["jan", "fev", "mar", "abr", "mai", "jun"])
   const [isAddOpen, setIsAddOpen] = useState(false)
   const [isEditOpen, setIsEditOpen] = useState(false)
@@ -234,6 +235,37 @@ export function DRETable() {
     setIsDeleteOpen(true)
   }
 
+  const toggleExpand = (id: string) => {
+    setExpandedIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]))
+  }
+
+  const isExpanded = (id: string) => expandedIds.includes(id)
+
+  const buildVisibleRows = () => {
+    const result: DRECategory[] = []
+    for (let i = 0; i < categories.length; i++) {
+      const cat = categories[i]
+      if (cat.level === 0) {
+        result.push(cat)
+        const hasChildren = categories[i + 1] && categories[i + 1].level > cat.level
+        if (hasChildren && isExpanded(cat.id)) {
+          let j = i + 1
+          while (j < categories.length && categories[j].level > cat.level) {
+            result.push(categories[j])
+            j++
+          }
+          i = j - 1
+        }
+      } else {
+        // If there's no preceding top-level (edge cases), include it
+        // Otherwise these will be added when their parent is expanded above
+        const prev = categories[i - 1]
+        if (!prev) result.push(cat)
+      }
+    }
+    return result
+  }
+
   return (
     <>
       <Card className="bg-card border-border">
@@ -277,7 +309,7 @@ export function DRETable() {
               </tr>
             </thead>
             <tbody>
-              {categories.map((category) => {
+              {buildVisibleRows().map((category) => {
                 const lastPeriod = selectedPeriods[selectedPeriods.length - 1]
                 const firstPeriod = selectedPeriods[0]
                 const receitaLiquida = categories.find((c) => c.id === "receita-liquida")?.values[lastPeriod] || 1
@@ -309,7 +341,35 @@ export function DRETable() {
                             : "var(--card)",
                       }}
                     >
-                      {category.name}
+                      <div className="flex items-center gap-2">
+                        {(() => {
+                          // detect if this row has children by peeking next item in original categories
+                          const idx = categories.findIndex((c) => c.id === category.id)
+                          const hasChildren = categories[idx + 1] && categories[idx + 1].level > category.level
+                          if (hasChildren) {
+                            return (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  toggleExpand(category.id)
+                                }}
+                                className="h-6 w-6 p-0"
+                              >
+                                {isExpanded(category.id) ? (
+                                  <ChevronDown className="h-4 w-4" />
+                                ) : (
+                                  <ChevronRight className="h-4 w-4" />
+                                )}
+                              </Button>
+                            )
+                          }
+                          return <span className="w-6 inline-block" />
+                        })()}
+
+                        <span className={`${category.level === 1 ? "pl-2" : ""}`}>{category.name}</span>
+                      </div>
                     </td>
                     {selectedPeriods.map((period) => (
                       <td

@@ -32,7 +32,7 @@ export function RegisterForm() {
 
     const success = await register(name, email, password, company)
     if (success) {
-      router.push("/dashboard")
+      router.push("/register/awaiting")
     } else {
       setError("Erro ao criar conta. Tente novamente.")
     }

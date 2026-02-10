@@ -4,6 +4,7 @@ import { Header } from "@/components/dashboard/header"
 import { DFCTable } from "@/components/dfc/dfc-table"
 import { DFCChart } from "@/components/dfc/dfc-chart"
 import { DFCKPIs } from "@/components/dfc/dfc-kpis"
+import { DFCDaily } from "@/components/dfc/dfc-daily"
 
 export default function DFCPage() {
   return (
@@ -17,6 +18,7 @@ export default function DFCPage() {
         <DFCKPIs />
         <DFCTable />
         <DFCChart />
+        <DFCDaily />
       </div>
     </div>
   )

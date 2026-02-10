@@ -13,12 +13,12 @@ import { Plus, Pencil, Trash2 } from "lucide-react"
 import { useState } from "react"
 
 type Period = "jan" | "fev" | "mar" | "abr" | "mai" | "jun"
-type Category = "operacional" | "investimento" | "financiamento"
+type ItemType = "entrada" | "saida"
 
 interface DFCItem {
   id: string
   name: string
-  category: Category
+  type: ItemType
   values: Record<Period, number>
 }
 
@@ -33,70 +33,46 @@ const periodLabels: Record<Period, string> = {
 
 const initialDfcData: DFCItem[] = [
   {
-    id: "lucro-liquido-dfc",
-    name: "Lucro Líquido do Período",
-    category: "operacional",
-    values: { jan: 45441, fev: 48975, mar: 52510, abr: 49985, mai: 54529, jun: 58568 },
+    id: "receita-produtos",
+    name: "Receita com produtos",
+    type: "entrada",
+    values: { jan: 45000, fev: 48000, mar: 52000, abr: 50000, mai: 54000, jun: 58000 },
   },
   {
-    id: "depreciacao",
-    name: "(+) Depreciação e Amortização",
-    category: "operacional",
-    values: { jan: 12000, fev: 12000, mar: 12000, abr: 12000, mai: 12000, jun: 12000 },
+    id: "receita-servicos",
+    name: "Receita com serviços",
+    type: "entrada",
+    values: { jan: 25000, fev: 27000, mar: 30000, abr: 28000, mai: 32000, jun: 35000 },
   },
   {
-    id: "var-clientes",
-    name: "(+/-) Variação de Clientes",
-    category: "operacional",
-    values: { jan: -15000, fev: -8000, mar: -12000, abr: 5000, mai: -18000, jun: -10000 },
+    id: "receita-juros",
+    name: "Receita de juros",
+    type: "entrada",
+    values: { jan: 2000, fev: 2500, mar: 3000, abr: 2500, mai: 3500, jun: 4000 },
   },
   {
-    id: "var-estoques",
-    name: "(+/-) Variação de Estoques",
-    category: "operacional",
-    values: { jan: -8000, fev: -5000, mar: -10000, abr: 3000, mai: -7000, jun: -12000 },
+    id: "pagto-fornecedores",
+    name: "Pagamento de fornecedores",
+    type: "saida",
+    values: { jan: -30000, fev: -32000, mar: -35000, abr: -33000, mai: -38000, jun: -40000 },
   },
   {
-    id: "var-fornecedores",
-    name: "(+/-) Variação de Fornecedores",
-    category: "operacional",
-    values: { jan: 10000, fev: 7000, mar: 15000, abr: -2000, mai: 12000, jun: 8000 },
+    id: "pagto-folha",
+    name: "Pagamento de folha",
+    type: "saida",
+    values: { jan: -25000, fev: -25000, mar: -25000, abr: -25000, mai: -25000, jun: -25000 },
   },
   {
-    id: "aquisicao-imob",
-    name: "(-) Aquisição de Imobilizado",
-    category: "investimento",
-    values: { jan: -25000, fev: -15000, mar: -30000, abr: -20000, mai: -35000, jun: -40000 },
+    id: "pagto-aluguel",
+    name: "Pagamento de aluguel",
+    type: "saida",
+    values: { jan: -5000, fev: -5000, mar: -5000, abr: -5000, mai: -5000, jun: -5000 },
   },
   {
-    id: "venda-ativos",
-    name: "(+) Venda de Ativos",
-    category: "investimento",
-    values: { jan: 0, fev: 5000, mar: 0, abr: 0, mai: 10000, jun: 0 },
-  },
-  {
-    id: "aplicacoes",
-    name: "(-) Aplicações Financeiras",
-    category: "investimento",
-    values: { jan: -10000, fev: -5000, mar: -15000, abr: -10000, mai: -20000, jun: -15000 },
-  },
-  {
-    id: "emprestimos",
-    name: "(+/-) Empréstimos e Financiamentos",
-    category: "financiamento",
-    values: { jan: -5000, fev: -5000, mar: 20000, abr: -8000, mai: -5000, jun: 15000 },
-  },
-  {
-    id: "dividendos",
-    name: "(-) Dividendos Pagos",
-    category: "financiamento",
-    values: { jan: -15000, fev: -15000, mar: -15000, abr: -15000, mai: -15000, jun: -15000 },
-  },
-  {
-    id: "aporte-capital",
-    name: "(+) Aporte de Capital",
-    category: "financiamento",
-    values: { jan: 0, fev: 0, mar: 0, abr: 0, mai: 50000, jun: 0 },
+    id: "pagto-utilidades",
+    name: "Pagamento de utilidades",
+    type: "saida",
+    values: { jan: -3000, fev: -3000, mar: -3000, abr: -3000, mai: -3000, jun: -3000 },
   },
 ]
 
@@ -118,7 +94,7 @@ export function DFCTable() {
   const [editingItem, setEditingItem] = useState<DFCItem | null>(null)
   const [formData, setFormData] = useState({
     name: "",
-    category: "operacional" as Category,
+    type: "entrada" as ItemType,
     jan: 0,
     fev: 0,
     mar: 0,
@@ -128,14 +104,14 @@ export function DFCTable() {
   })
 
   const resetForm = () => {
-    setFormData({ name: "", category: "operacional", jan: 0, fev: 0, mar: 0, abr: 0, mai: 0, jun: 0 })
+    setFormData({ name: "", type: "entrada", jan: 0, fev: 0, mar: 0, abr: 0, mai: 0, jun: 0 })
   }
 
   const handleAdd = () => {
     const newItem: DFCItem = {
       id: `custom-${Date.now()}`,
       name: formData.name,
-      category: formData.category,
+      type: formData.type,
       values: {
         jan: formData.jan,
         fev: formData.fev,
@@ -158,7 +134,7 @@ export function DFCTable() {
           ? {
               ...item,
               name: formData.name,
-              category: formData.category,
+              type: formData.type,
               values: {
                 jan: formData.jan,
                 fev: formData.fev,
@@ -187,7 +163,7 @@ export function DFCTable() {
     setEditingItem(item)
     setFormData({
       name: item.name,
-      category: item.category,
+      type: item.type,
       jan: item.values.jan,
       fev: item.values.fev,
       mar: item.values.mar,
@@ -203,19 +179,22 @@ export function DFCTable() {
     setIsDeleteOpen(true)
   }
 
-  const calculateTotal = (category: Category, period: Period): number => {
-    return items.filter((i) => i.category === category).reduce((sum, item) => sum + item.values[period], 0)
+  const calculateTotalByType = (type: ItemType, period: Period): number => {
+    return items.filter((i) => i.type === type).reduce((sum, item) => sum + item.values[period], 0)
+  }
+
+  const calculateSaldoOperacional = (period: Period): number => {
+    const entradas = calculateTotalByType("entrada", period)
+    const saidas = calculateTotalByType("saida", period)
+    return entradas + saidas
   }
 
   const calculateSaldoFinal = (period: Period): number => {
-    const operacional = calculateTotal("operacional", period)
-    const investimento = calculateTotal("investimento", period)
-    const financiamento = calculateTotal("financiamento", period)
-    return saldoInicial[period] + operacional + investimento + financiamento
+    return saldoInicial[period] + calculateSaldoOperacional(period)
   }
 
-  const renderCategorySection = (category: Category, title: string, bgClass: string, textClass: string) => {
-    const categoryItems = items.filter((i) => i.category === category)
+  const renderTypeSection = (type: ItemType, title: string, bgClass: string, textClass: string) => {
+    const typeItems = items.filter((i) => i.type === type)
     return (
       <>
         <tr className={`border-b border-border ${bgClass}`}>
@@ -223,7 +202,7 @@ export function DFCTable() {
             {title}
           </td>
         </tr>
-        {categoryItems.map((item) => (
+        {typeItems.map((item) => (
           <tr key={item.id} className="border-b border-border hover:bg-secondary/30 group">
             <td className="py-3 px-4 text-sm text-foreground pl-8 sticky left-0 bg-card">{item.name}</td>
             {periods.map((period) => (
@@ -231,7 +210,7 @@ export function DFCTable() {
                 key={period}
                 className={cn(
                   "py-3 px-4 text-sm text-right tabular-nums",
-                  item.values[period] < 0 ? "text-destructive" : "text-success",
+                  type === "entrada" ? "text-success" : "text-destructive",
                 )}
               >
                 {formatCurrency(item.values[period])}
@@ -254,18 +233,18 @@ export function DFCTable() {
             </td>
           </tr>
         ))}
-        <tr className="border-b border-border bg-secondary/50">
-          <td className="py-3 px-4 text-sm font-semibold text-foreground sticky left-0 bg-secondary/50">
-            Total {title.split(" ").pop()}
+        <tr className={`border-b border-border ${bgClass}/50`}>
+          <td className={`py-3 px-4 text-sm font-semibold sticky left-0 ${bgClass}/50`}>
+            Total {title}
           </td>
           {periods.map((period) => {
-            const total = calculateTotal(category, period)
+            const total = calculateTotalByType(type, period)
             return (
               <td
                 key={period}
                 className={cn(
                   "py-3 px-4 text-sm text-right tabular-nums font-semibold",
-                  total >= 0 ? "text-success" : "text-destructive",
+                  type === "entrada" ? "text-success" : "text-destructive",
                 )}
               >
                 {formatCurrency(total)}
@@ -289,24 +268,25 @@ export function DFCTable() {
           </Button>
         </CardHeader>
         <CardContent className="overflow-x-auto">
-          <table className="w-full min-w-[1000px]">
+          <table className="w-full min-w-300">
             <thead>
               <tr className="border-b border-border">
-                <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground sticky left-0 bg-card min-w-[280px]">
+                <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground sticky left-0 bg-card min-w-75">
                   Descrição
                 </th>
                 {periods.map((period) => (
                   <th
                     key={period}
-                    className="text-right py-3 px-4 text-sm font-medium text-muted-foreground min-w-[100px]"
+                    className="text-right py-3 px-4 text-sm font-medium text-muted-foreground min-w-30"
                   >
                     {periodLabels[period]}
                   </th>
                 ))}
-                <th className="text-center py-3 px-4 text-sm font-medium text-muted-foreground min-w-[100px]">Ações</th>
+                <th className="text-center py-3 px-4 text-sm font-medium text-muted-foreground min-w-25">Ações</th>
               </tr>
             </thead>
             <tbody>
+              {/* Saldo Inicial */}
               <tr className="border-b border-border bg-secondary/30">
                 <td className="py-3 px-4 text-sm font-semibold text-foreground sticky left-0 bg-secondary/30">
                   Saldo Inicial
@@ -318,11 +298,40 @@ export function DFCTable() {
                 ))}
                 <td></td>
               </tr>
-              {renderCategorySection("operacional", "Atividades Operacionais", "bg-primary/5", "text-primary")}
-              {renderCategorySection("investimento", "Atividades de Investimento", "bg-chart-4/10", "text-chart-4")}
-              {renderCategorySection("financiamento", "Atividades de Financiamento", "bg-chart-5/10", "text-chart-5")}
+
+              {/* Entradas */}
+              {renderTypeSection("entrada", "Entradas", "bg-green-500/5", "text-green-600 dark:text-green-400")}
+
+              {/* Saídas */}
+              {renderTypeSection("saida", "Saídas", "bg-red-500/5", "text-red-600 dark:text-red-400")}
+
+              {/* Saldo Operacional */}
+              <tr className="border-b border-border bg-blue-500/10">
+                <td className="py-3 px-4 text-sm font-bold text-blue-600 dark:text-blue-400 sticky left-0 bg-blue-500/10">
+                  Saldo Operacional
+                </td>
+                {periods.map((period) => {
+                  const saldoOp = calculateSaldoOperacional(period)
+                  return (
+                    <td
+                      key={period}
+                      className={cn(
+                        "py-3 px-4 text-sm text-right tabular-nums font-bold",
+                        saldoOp >= 0 ? "text-success" : "text-destructive",
+                      )}
+                    >
+                      {formatCurrency(saldoOp)}
+                    </td>
+                  )
+                })}
+                <td></td>
+              </tr>
+
+              {/* Saldo Final */}
               <tr className="bg-primary/10">
-                <td className="py-3 px-4 text-sm font-bold text-primary sticky left-0 bg-primary/10">Saldo Final</td>
+                <td className="py-3 px-4 text-sm font-bold text-primary sticky left-0 bg-primary/10">
+                  Saldo Final
+                </td>
                 {periods.map((period) => (
                   <td key={period} className="py-3 px-4 text-sm text-right tabular-nums font-bold text-primary">
                     {formatCurrency(calculateSaldoFinal(period))}
@@ -347,23 +356,22 @@ export function DFCTable() {
             <Input
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              placeholder="Ex: Pagamento de Fornecedores"
+              placeholder="Ex: Receita com produtos"
               className="bg-input border-border"
             />
           </div>
           <div className="grid gap-2">
-            <Label>Categoria</Label>
+            <Label>Tipo</Label>
             <Select
-              value={formData.category}
-              onValueChange={(v) => setFormData({ ...formData, category: v as Category })}
+              value={formData.type}
+              onValueChange={(v) => setFormData({ ...formData, type: v as ItemType })}
             >
               <SelectTrigger className="bg-input border-border">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="operacional">Operacional</SelectItem>
-                <SelectItem value="investimento">Investimento</SelectItem>
-                <SelectItem value="financiamento">Financiamento</SelectItem>
+                <SelectItem value="entrada">Entrada</SelectItem>
+                <SelectItem value="saida">Saída</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -405,18 +413,17 @@ export function DFCTable() {
             />
           </div>
           <div className="grid gap-2">
-            <Label>Categoria</Label>
+            <Label>Tipo</Label>
             <Select
-              value={formData.category}
-              onValueChange={(v) => setFormData({ ...formData, category: v as Category })}
+              value={formData.type}
+              onValueChange={(v) => setFormData({ ...formData, type: v as ItemType })}
             >
               <SelectTrigger className="bg-input border-border">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="operacional">Operacional</SelectItem>
-                <SelectItem value="investimento">Investimento</SelectItem>
-                <SelectItem value="financiamento">Financiamento</SelectItem>
+                <SelectItem value="entrada">Entrada</SelectItem>
+                <SelectItem value="saida">Saída</SelectItem>
               </SelectContent>
             </Select>
           </div>

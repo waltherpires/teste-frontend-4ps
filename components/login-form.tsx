@@ -25,7 +25,7 @@ export function LoginForm() {
 
     const success = await login(email, password)
     if (success) {
-      router.push("/dashboard")
+      router.push("/dashboard/dre")
     } else {
       setError("Email ou senha inválidos")
     }

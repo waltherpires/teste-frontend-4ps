@@ -319,6 +319,88 @@ export const delinquencyData = {
   ],
 }
 
+// Payable/Accounts Payable Data (Endividamento)
+export const payableData = {
+  summary: {
+    totalAPagar: 285000,
+    pagamentosNoMes: 12,
+    tempoMedioPagamento: 35,
+    fornecedoresAtivos: 15,
+  },
+  suppliers: [
+    {
+      id: 1,
+      name: "Fornecedor Premium Ltda",
+      document: "11.111.111/0001-11",
+      totalAmount: 52000,
+      daysUntilDue: -15,
+      status: "overdue",
+    },
+    {
+      id: 2,
+      name: "Materiais ABC S.A.",
+      document: "22.222.222/0001-22",
+      totalAmount: 48000,
+      daysUntilDue: -8,
+      status: "overdue",
+    },
+    {
+      id: 3,
+      name: "Insumos Industriais Ltda",
+      document: "33.333.333/0001-33",
+      totalAmount: 42000,
+      daysUntilDue: 3,
+      status: "critical",
+    },
+    {
+      id: 4,
+      name: "Distribuidor Beta ME",
+      document: "44.444.444/0001-44",
+      totalAmount: 38000,
+      daysUntilDue: 8,
+      status: "warning",
+    },
+    {
+      id: 5,
+      name: "Peças Técnicas Omega",
+      document: "55.555.555/0001-55",
+      totalAmount: 35000,
+      daysUntilDue: 12,
+      status: "warning",
+    },
+    {
+      id: 6,
+      name: "Serviços Logísticos Gama",
+      document: "66.666.666/0001-66",
+      totalAmount: 30000,
+      daysUntilDue: 18,
+      status: "attention",
+    },
+    {
+      id: 7,
+      name: "Fornecedor Delta Ltda",
+      document: "77.777.777/0001-77",
+      totalAmount: 25000,
+      daysUntilDue: 22,
+      status: "attention",
+    },
+    {
+      id: 8,
+      name: "Supplier Iota Comércio",
+      document: "88.888.888/0001-88",
+      totalAmount: 15000,
+      daysUntilDue: 28,
+      status: "normal",
+    },
+  ],
+  dueDateAnalysis: [
+    { range: "Vencido", value: 100000, count: 2 },
+    { range: "1-7 dias", value: 42000, count: 1 },
+    { range: "8-30 dias", value: 93000, count: 5 },
+    { range: "> 30 dias", value: 50000, count: 2 },
+  ],
+}
+
 // Pricing/CMV Data
 export const pricingData = {
   products: [
