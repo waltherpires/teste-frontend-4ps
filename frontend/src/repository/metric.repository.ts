@@ -1,4 +1,4 @@
-import { MetricsDataSource } from "@/src/sources/financial/metrics.data-source";
+import { MetricsDataSource, MetricsFilter } from "@/src/sources/financial/metrics.data-source";
 import { DateRange } from "@/src/types/date-range";
 
 export class MetricRepository {
@@ -6,7 +6,7 @@ export class MetricRepository {
     private datasource: MetricsDataSource
   ) {}
 
-  getMetrics(period: DateRange) {
-    return this.datasource.getMetrics(period);
+  getMetrics(period: DateRange, filter?: MetricsFilter) {
+    return this.datasource.getMetrics(period, filter);
   }
 }

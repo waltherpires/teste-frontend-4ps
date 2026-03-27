@@ -2,6 +2,7 @@ import { createClient } from "@/src/lib/server";
 import { HeaderMenu } from "./Menu";
 import { CompanySwitcher } from "../../company-switcher";
 import SidebarTriggerMobile from "./sidebar-trigger-mobile";
+import { CompanyAggregatorSelector } from "./company-aggregator-selector";
 
 export interface HeaderFinancialProps {
   title: string;
@@ -26,9 +27,9 @@ export default async function HeaderFinancial({
           )}
         </div>
       </div>
-      <div className="flex flex-row gap-2">
+      <div className="flex flex-row gap-2 items-center">
         <CompanySwitcher size="lg" />
-
+        <CompanyAggregatorSelector />
         <HeaderMenu
           userInitial={
             data?.claims?.user_metadata

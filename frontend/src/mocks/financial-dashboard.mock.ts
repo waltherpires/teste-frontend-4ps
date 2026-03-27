@@ -4,7 +4,7 @@ import {
   MonthlyFinancialData,
 } from "../types/financial";
 
-export const dashboardMetrics: MetricDTO[] = [
+const baseDashboardMetrics: MetricDTO[] = [
   {
     title: "Faturamento",
     value: 493000,
@@ -19,26 +19,20 @@ export const dashboardMetrics: MetricDTO[] = [
     title: "Lucro Líquido",
     value: 58568,
     valueUnit: "currency",
-
     comparison: 7.4,
     comparisonUnit: "percentage",
-
     trend: 70000,
     trendUnit: "currency",
-
     goalProgress: 56,
   },
   {
     title: "Lucro Bruto",
     value: 58568,
     valueUnit: "currency",
-
     comparison: 7.4,
     comparisonUnit: "percentage",
-
     trend: 70000,
     trendUnit: "currency",
-
     goalProgress: 56,
   },
   {
@@ -80,6 +74,104 @@ export const dashboardMetrics: MetricDTO[] = [
     comparisonUnit: "percentage",
   },
 ];
+
+const companyMetricMultipliers: Record<string, number> = {
+  "company-1": 1,
+  "company-2": 0.78,
+  "company-3": 1.32,
+  "company-4": 0.91,
+};
+
+const buildMetricsForCompany = (companyId: string | undefined): MetricDTO[] => {
+  const safeCompanyId = companyId && companyId.trim() ? companyId : "company-1";
+  const multiplier =
+    companyMetricMultipliers[safeCompanyId] ??
+    (1 +
+      ((safeCompanyId
+        .split("")
+        .reduce((acc, c) => acc + c.charCodeAt(0), 0) % 30) -
+        10) / 100);
+
+  return baseDashboardMetrics.map((metric) => ({
+    ...metric,
+    value: Number((metric.value * multiplier).toFixed(0)),
+    comparison:
+      metric.comparison !== undefined
+        ? Number((metric.comparison * multiplier).toFixed(1))
+        : undefined,
+    trend:
+      metric.trend !== undefined
+        ? Number((metric.trend * multiplier).toFixed(0))
+        : undefined,
+    goalProgress:
+      metric.goalProgress !== undefined
+        ? Number(
+            Math.max(10, Math.min(99, Math.round(metric.goalProgress * multiplier)))
+          )
+        : undefined,
+  }));
+};
+
+export const dashboardMetricsByCompany: Record<string, MetricDTO[]> = {
+  "company-1": buildMetricsForCompany("company-1"),
+  "company-2": buildMetricsForCompany("company-2"),
+  "company-3": buildMetricsForCompany("company-3"),
+};
+
+const buildMetricMap = (metrics: MetricDTO[]) =>
+  Object.fromEntries(metrics.map((it) => [it.title, it]));
+
+export function aggregateMetrics(companyIds: string[]): MetricDTO[] {
+  if (companyIds.length === 0) {
+    return dashboardMetricsByCompany["company-1"];
+  }
+
+  const companiesMetrics = companyIds.map((companyId) => {
+    return (
+      dashboardMetricsByCompany[companyId] ||
+      buildMetricsForCompany(companyId)
+    );
+  });
+
+  const allTitles = Array.from(
+    new Set(companiesMetrics.flatMap((metrics) => metrics.map((m) => m.title)))
+  );
+
+  return allTitles.map((title) => {
+    const items = companiesMetrics
+      .map((company) => company.find((m) => m.title === title))
+      .filter((x): x is MetricDTO => Boolean(x));
+
+    const totalValue = items.reduce((acc, item) => acc + item.value, 0);
+    const totalTrend = items.reduce((acc, item) => acc + (item.trend ?? 0), 0);
+    const averageComparison =
+      items.length > 0
+        ? items.reduce((acc, item) => acc + (item.comparison ?? 0), 0) /
+          items.length
+        : undefined;
+    const averageGoalProgress =
+      items.length > 0
+        ? Math.round(
+            items.reduce((acc, item) => acc + (item.goalProgress ?? 0), 0) /
+              items.length
+          )
+        : undefined;
+
+    const first = items[0];
+
+    return {
+      title,
+      value: totalValue,
+      valueUnit: first.valueUnit,
+      comparison:
+        averageComparison !== undefined ? Number(averageComparison.toFixed(1)) : undefined,
+      comparisonUnit: first.comparisonUnit,
+      trend: items.some((item) => item.trend !== undefined) ? totalTrend : undefined,
+      trendUnit: first.trendUnit,
+      goalProgress: averageGoalProgress,
+    };
+  });
+}
 
 export const monthlyFinancialData: MonthlyFinancialData[] = [
   { year: 2025, month: "Jan", revenue: 80000, expense: 45000 },
